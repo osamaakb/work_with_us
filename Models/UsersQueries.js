@@ -25,7 +25,7 @@ const createUser = (request, response) => {
     const { name, email, password } = request.body
     ;(async => {
         const client = await pool.connect
-        try{
+        try{ 
             const res = await client.query('INSERT INTO users (name, email, password) VALUES ($1,$2,$3)', [name, email, password])
             response.status(201).send(`User created ${res.ins}`)
         }finally{
@@ -34,7 +34,7 @@ const createUser = (request, response) => {
     })().catch(e => console.log(e.stack))
 }
 
-
+// commit
 
 
 
