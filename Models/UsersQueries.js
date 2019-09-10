@@ -34,8 +34,6 @@ const createUser = (request, response) => {
     })().catch(e => console.log(e.stack))
 }
 
-// commit
-
 
 
 module.exports = {
