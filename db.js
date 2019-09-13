@@ -9,15 +9,15 @@ pool.on('error', (err, client) => {
 
 async function query(queryString, ...args) {
     const client = await pool.connect()
-    let res;
     try {
-         res = await client.query(queryString, ...args)
-        console.log(res)        
+        const res = await client.query(queryString, ...args)
+        client.release()
+        return res
+    } catch (err) {
+        client.release()
+        throw err
     }
-    finally {
-        client.release()  
-        return res      
-    }
+
 }
 
-module.exports = {query};
+module.exports = { query };
