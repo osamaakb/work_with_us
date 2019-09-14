@@ -37,9 +37,8 @@ router.get('/me', auth, (req, res, next) => {
 router.post('/login',validate(userSchema.login), async (req, res, next) => {
 
     const { email, password } = req.body
-    const { rows } = await UserModel.findUserByEmail(email)
-    if (rows[0]) {
-        const user = rows[0]
+    const user = await UserModel.findUserByEmail(email)
+    if (user) {        
         const checkPass = await UserServices.checkPass(password, user.password)
         if (checkPass) {
             let token = jwt.sign({ email: email }, secret);

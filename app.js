@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 // expressLogging = require('express-logging'),
 //     logger = require('logops');
+const morgan = require('morgan')
 
 const passport = require('./intializers/passport')
 const { constructResponse } = require('./Services/response')
@@ -12,13 +13,15 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(passport.initialize());
 
+app.use(morgan('combined'))
+
+
 const port = 3000
 
 const UserController = require('./Controllers/users-controller')
 const JobOffersController = require('./Controllers/job-offers-controller')
 const AreasController = require('./Controllers/areas-controller')
 const CategoriesController = require('./Controllers/categories-controller')
-
 
 
 app.use('/api/users', UserController)

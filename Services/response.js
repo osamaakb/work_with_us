@@ -4,13 +4,13 @@ class Response {
 
     static constructResponse(payload, success = true) {
 
-        delete payload.password
         if(!success){
             return {
                 success,
                 message: payload
             }
         }
+        delete payload.password
         return {
             success,
             payload

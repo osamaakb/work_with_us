@@ -11,12 +11,10 @@ opts.secretOrKey = process.env.SECRET
 
 passport.use(new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
-        const { rows, ...response } = await userModel.findUserByEmail(jwt_payload.email)
-
-        console.log(rows[0])
+        const user = await userModel.findUserByEmail(jwt_payload.email)
         
-        if (rows) {
-            return done(null, rows[0])
+        if (user) {
+            return done(null, user)
         }
         else {
             return done(null, false);

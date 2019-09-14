@@ -1,29 +1,32 @@
 const router = require('express').Router();
-const jobOffersModel = require('../Models/job-offers-model')
+const JobOffersModel = require('../Models/job-offers-model')
+const passport = require('passport')
+const { constructResponse } = require('../Services/response')
+const { auth } = require('../intializers/passport')
+
 
 router.get('/', async (req, res) => {
-    try{
-    const jobOffers = await jobOffersModel.getJobOffers()
-    if(jobOffers.rows.length === 0){
-        res.json({meesage: 'No items Available'})
-    }
-    res.json(jobOffers.rows)
-    }catch(err){
-        res.status(500).send(err)
-    }
+    const jobOffers = await JobOffersModel.getJobOffers(req.query)
+    res.json(constructResponse(jobOffers.rows))
 })
 
-router.post('/', async (req, res) => {
-    try{
-        const fields = req.body
-        const jobOffer = await jobOffersModel.createJobOffer(fields)
-        res.status(201).json(jobOffer.rows)
-    } catch(err) {
-        if (err == 'ParamsNotFound') {
-            res.status(400)
-        } else {
-            res.status(500).send(err)
-        }
+router.post('/', auth, async (req, res) => {
+    const fields = req.body
+    const jobOffer = await req.user.createJobOffer(fields)
+    // fields.user_id = req.user.id
+    // const jobOffer = await jobOffersModel.createJobOffer(fields)
+    res.status(201).json(constructResponse(jobOffer.rows[0]))
+})
+
+
+router.delete('/:id', auth, async (req, res) => {
+    const { id } = req.params
+    const jobOffer = await JobOffersModel.findJobOfferById(id)
+    if (jobOffer && req.user.id === jobOffer.user_id) {
+        await jobOffer.deleteJobOffer()
+        res.status(201).json(constructResponse([]))
+    } else {
+        res.status(403).json(constructResponse("You are not allowed to delete this job offer", false))
     }
 })
 
