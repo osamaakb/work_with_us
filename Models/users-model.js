@@ -20,10 +20,16 @@ class UserModel {
         })
     }
 
-    createJobOffer(fields) {
+    createJobOffer(fields, skills) {
         fields.user_id = this.id;
-        return JobOffersModel.createJobOffer(fields);
+        return JobOffersModel.createJobOffer(fields, skills);
     }
+
+    updateJobOffer(fields, skills) {
+        fields.user_id = this.id;
+        return JobOffersModel.updateJobOffer(fields, skills);
+    }
+
 
     getJobOffers() {
         return JobOffersModel.findByUserId(this.id);
