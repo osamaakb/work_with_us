@@ -15,7 +15,6 @@ router.post('/', auth, async (req, res) => {
     const fields = req.body
     const skills = fields.skills
     delete fields.skills
-    console.log(skills)
     const jobOffer = await req.user.createJobOffer(fields, skills)
     // const skillsRes = await SkillsModel.createSkills(skills, jobOffer.rows[0].id)
     // jobOffer.rows[0].skills = skillsRes.rows
@@ -26,7 +25,6 @@ router.put('/', auth, async (req, res) => {
     const fields = req.body
     const skills = fields.skills
     delete fields.skills
-    console.log(skills)
     const jobOffer = await req.user.updateJobOffer(fields, skills)
     // const skillsRes = await SkillsModel.createSkills(skills, jobOffer.rows[0].id)
     // jobOffer.rows[0].skills = skillsRes.rows

@@ -2,6 +2,9 @@ require('dotenv').config()
 const express = require('express')
 // expressLogging = require('express-logging'),
 //     logger = require('logops');
+
+const sequelize = require('./ormDB')
+
 const morgan = require('morgan')
 
 const passport = require('./intializers/passport')
@@ -22,12 +25,15 @@ const UserController = require('./Controllers/users-controller')
 const JobOffersController = require('./Controllers/job-offers-controller')
 const AreasController = require('./Controllers/areas-controller')
 const CategoriesController = require('./Controllers/categories-controller')
+const PortfoliosController = require('./Controllers/portfolios-controller')
 
 
 app.use('/api/users', UserController)
 app.use('/api/offers', JobOffersController)
 app.use('/api/areas', AreasController)
 app.use('/api/categories', CategoriesController)
+app.use('/api/portfolios', PortfoliosController)
+
 
 
 // logger.info('Request from %s: %s %s', clientIpAddress, requestMethod, requestUrl);

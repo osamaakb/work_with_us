@@ -1,4 +1,19 @@
+const Portfolio = require('./portfolios-model')
+const sequelize = require('../ormDB')
+const Project = require('./projects-model')
+// const Sequelize, { Model } = require('sequlize')
 
+// class User extends Model {}
+
+// User.init({
+//     email: Sequelize.STRING,
+//     password: Sequelize.STRING,
+//     name: Sequelize.STRING,
+// }, { sequelize, modelName: 'user' })
+
+// User.hasMany(Portfolio)
+
+// module.exports = User
 const { query } = require('../db')
 const JobOffersModel = require('./job-offers-model')
 
@@ -9,7 +24,7 @@ class UserModel {
     static deleteUser(id) { return query('DELETE FROM users WHERE id = $1', [id]) }
     static getSingleUser(id) { return query(`SELECT * FROM users WHERE id= $1`, [id]) }
     static async findUserByEmail(email) {
-        const res = await query('SELECT * FROM users WHERE email = $1' ,[email])
+        const res = await query('SELECT * FROM users WHERE email = $1', [email])
         if (res.rows) return new UserModel(res.rows[0])
         return null
     }
@@ -33,6 +48,21 @@ class UserModel {
 
     getJobOffers() {
         return JobOffersModel.findByUserId(this.id);
+    }
+
+    async createPortfolio(fields) {
+        console.log(fields)
+        fields.user_id = this.id
+        return Portfolio.create(fields, {
+            include: [
+                {
+                    model: Project,
+                    as: 'projects'
+                }
+            ]
+        }).then((value) => {
+            return value.reload()
+        })
     }
 }
 
