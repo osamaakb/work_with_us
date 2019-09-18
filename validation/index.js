@@ -1,7 +1,7 @@
 const {constructResponse} = require('../Services/response')
-const validate = (schema) => {
+const validate = (schema, from = 'body') => {
     return (req, res, next) => {
-        const { error } = schema.validate(req.body);
+        const { error } = schema.validate(req[from]);
         const valid = error == null;
 
         if (valid) {

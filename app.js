@@ -3,7 +3,7 @@ const express = require('express')
 // expressLogging = require('express-logging'),
 //     logger = require('logops');
 
-const sequelize = require('./ormDB')
+require('./Models')
 
 const morgan = require('morgan')
 

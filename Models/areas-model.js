@@ -1,10 +1,21 @@
-const { query } = require('../db')
+const { Model } = require('sequelize');
 
-class AreaModel {
-    static getAreas() { return query('SELECT * FROM areas') }
-    static createArea(title) { return query('INSERT INTO areas (title) VALUES ($1) RETURNING *', [title]) }
-    static deleteArea(id) { return query('DELETE FROM areas WHERE id = $1', [id]) }    
+module.exports = (sequelize, DataTypes) => {
+    class AreaModel extends Model {
+        static associate(models) {
+            AreaModel.hasMany(models.portfolios, {as: 'portfolio', foreignKey: 'area_id'})
+        }
+     }
+
+    AreaModel.init({
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
+    }, {
+            sequelize,
+            modelName: "areas"
+        })
+    
+    return AreaModel
 }
-
-
-module.exports = AreaModel

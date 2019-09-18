@@ -1,65 +1,63 @@
-const sequelize = require('../ormDB')
-// const User = require('./users-model')
-const Project = require('./projects-model')
-const Sequelize = require('sequelize');
-const Model = Sequelize.Model
+const { Model } = require('sequelize');
 
-class PortfolioModel extends Model {}
+module.exports = (sequelize, DataTypes) => {
+    class PortfolioModel extends Model {
+        static associate(models) {
+            PortfolioModel.belongsTo(models.categories)
+            PortfolioModel.belongsTo(models.areas)
+            PortfolioModel.hasMany(models.portfolio_projects, { as: 'projects', foreignKey: 'portfolio_id' })
+        }
+    }
 
 
-PortfolioModel.init(
-    {
-        user_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        area_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        category_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        title: {
-            type: Sequelize.TEXT,
-            allowNull: false
-        },
-        name: {
-            type: Sequelize.TEXT,
-            allowNull: false
-        },
-        job_type:{
-            type : Sequelize.ENUM('part','full','contract')
-        },
-        phone: {
-            type: Sequelize.TEXT,
-            allowNull: false
-        },
-        email: {
-            type: Sequelize.TEXT
-        },
-        lat: {
-            type: Sequelize.FLOAT
-        },
-        lng: {
-            type: Sequelize.FLOAT
-        },
-        website: {
-            type: Sequelize.TEXT
-        },
-        cv: {
-            type: Sequelize.TEXT
-        },
-    }, {
-        modelName: 'portfolios',
-        sequelize,
-    });
+    PortfolioModel.init(
+        {
+            user_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
+            area_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
+            category_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
+            title: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            name: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            job_type: {
+                type: DataTypes.ENUM('part', 'full', 'contract')
+            },
+            phone: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            },
+            email: {
+                type: DataTypes.TEXT
+            },
+            lat: {
+                type: DataTypes.FLOAT
+            },
+            lng: {
+                type: DataTypes.FLOAT
+            },
+            website: {
+                type: DataTypes.TEXT
+            },
+            cv: {
+                type: DataTypes.TEXT
+            },
+        }, {
+            modelName: 'portfolios',
+            sequelize
+        });
 
-console.log(PortfolioModel)
-    
-
-    PortfolioModel.hasMany(Project, {as: 'projects', foreignKey: 'portfolio_id'})
-    // PortfolioModel.belongsTo(User)
-
-    module.exports = PortfolioModel
+    return PortfolioModel
+}

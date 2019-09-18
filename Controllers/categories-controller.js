@@ -1,19 +1,20 @@
-const CategoriesModel = require('../Models/categories-model')
+const models = require('../Models/index')
+const CategoriesModel = models.categories
 const router = require('express').Router();
 const { constructResponse } = require('../Services/response')
 
 
 router.get('/', async (req, res, next) => {
-    const categories = await CategoriesModel.getCategories();
-    res.json(constructResponse(categories.rows))
+    const categories = await CategoriesModel.findAll();
+    res.json(constructResponse(categories))
 })
 
 router.post('/', async (req, res, next) => {
     try {
         const { title } = req.body
-        const categories = await CategoriesModel.createCategories(title);
+        const categories = await CategoriesModel.create({ title: title });
         console.log(categories)
-        res.json(constructResponse(categories.rows[0]))
+        res.json(constructResponse(categories))
     } catch (err) {
         next(err)
     }
@@ -21,7 +22,7 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
     const { id } = req.params
-    await CategoriesModel.deleteCategories(id);
+    await CategoriesModel.destroy({ where: { id: id } });
     res.json(constructResponse({}))
 })
 
