@@ -1,20 +1,25 @@
 
+const defaultOptions = {
+    pageInfo: null,
+    success: true
+}
 
 class Response {
-
-    static constructResponse(payload, success = true) {
-
-        if(!success){
-            return {
-                success,
-                message: payload
+    static constructResponse(payload, options) {
+        const success = options.success || defaultOptions.success
+        const pageInfo = options.pageInfo || defaultOptions.pageInfo
+        const response = { success }
+        if (!success) {
+            response.message = payload
+        } else {
+            delete payload.password
+            response.payload = payload
+            if (pageInfo) {
+                response.pageInfo = pageInfo
             }
         }
-        delete payload.password
-        return {
-            success,
-            payload
-        }
+
+        return response
     }
 }
 

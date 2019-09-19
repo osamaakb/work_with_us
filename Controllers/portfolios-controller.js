@@ -11,28 +11,27 @@ const Category = models.categories
 const Area = models.areas
 
 
-router.get('/', validate(portfolioSchema.query, 'query'), async (req, res) => {
+router.get('/:id*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
     const query = req.query
-    const portfolios = await PortfoliosModel.findAll({
-        where: query,
-        order: ['id'],
-        include: [{
-            model: Project,
-            as: 'projects',
-        },
-        {
-            model: Category,
-            attributes: ['title'],
-            required: true,
-        },
-        {
-            model: Area,
-            attributes: ['title'],
-            required: true,
-        }
-        ]
+    const { id } = req.params
+    let portfolios
+    if (id) {
+        portfolios = await PortfoliosModel.findAllAfter(query, id)
+    } else {
+        portfolios = await PortfoliosModel.scope('withAssociations','limitOrder').findAll({
+            where: query ,
+        })
+
+    }
+    const count = await PortfoliosModel.count({
+        where: query
     })
-    res.json(constructResponse(portfolios))
+    const pageInfo = {
+        next: portfolios[portfolios.length - 1].id,
+        previous: portfolios[0].id,
+        totalCount: count
+    }
+    res.json(constructResponse(portfolios, { pageInfo }))
 })
 
 router.post('/', auth, async (req, res) => {
@@ -48,7 +47,7 @@ router.delete('/:id', auth, async (req, res) => {
         await PortfoliosModel.destroy({ where: { id: id } })
         res.status(201).json(constructResponse([]))
     } else {
-        res.status(403).json(constructResponse("You are not allowed to delete this job offer", false))
+        res.status(403).json(constructResponse("You are not allowed to delete this job offer", { success: false }))
     }
 })
 

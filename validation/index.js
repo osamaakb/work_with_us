@@ -11,7 +11,7 @@ const validate = (schema, from = 'body') => {
             const message = details.map(i => i.message).join(',');
 
             console.log("error", message);
-            res.status(422).json(constructResponse(message, false))
+            res.status(422).json(constructResponse(message, { success: false }))
         }
     }
 }

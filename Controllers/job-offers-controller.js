@@ -6,9 +6,16 @@ const { constructResponse } = require('../Services/response')
 const { auth } = require('../intializers/passport')
 
 
-router.get('/', async (req, res) => {
-    const jobOffers = await JobOffersModel.getJobOffers(req.query)
-    res.json(constructResponse(jobOffers.rows))
+router.get('/:id*?', async (req, res) => {
+    const jobOffers = await JobOffersModel.getJobOffers(req.query,req.params.id)
+    const count = await JobOffersModel.JobOffersCount()
+    const pageInfo = {
+        next: jobOffers.rows[jobOffers.rows.length - 1].id,
+        previous: jobOffers.rows[0].id,
+        totalCount: parseInt(count.rows[0].count)
+    }
+
+    res.json(constructResponse(jobOffers.rows, {pageInfo}))
 })
 
 router.post('/', auth, async (req, res) => {
@@ -40,7 +47,7 @@ router.delete('/:id', auth, async (req, res) => {
         await jobOffer.deleteJobOffer()
         res.status(201).json(constructResponse([]))
     } else {
-        res.status(403).json(constructResponse("You are not allowed to delete this job offer", false))
+        res.status(403).json(constructResponse("You are not allowed to delete this job offer", { success: false }))
     }
 })
 

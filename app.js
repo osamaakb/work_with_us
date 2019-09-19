@@ -41,13 +41,13 @@ app.use('/api/portfolios', PortfoliosController)
 
 app.use(function (req, res, next) {
     res.status(404);
-    res.send(constructResponse("Not found", false));
+    res.send(constructResponse("Not found", { success: false }));
 });
 
 app.use(function (data, req, res, next) {
     if (data instanceof Error) {
         console.error(data.stack)
-        res.status(500).json(constructResponse(data.message, false))
+        res.status(500).json(constructResponse(data.message, { success: false }))
     } else {
         res.json(constructResponse(data))
     }

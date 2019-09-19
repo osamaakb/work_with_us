@@ -1,16 +1,38 @@
 const { query } = require('../db')
 
 class JobOffersModel {
-    static async getJobOffers(queryConditions) {
+
+
+
+    static JobOffersCount(){
+        return query('SELECT COUNT(*) FROM job_offers' )
+    }
+
+
+    static conditioner(queryConditions, id) {
         let areaIdCondition = ''
         let categoryIdCondition = ''
+        let afterId = 0
         if (queryConditions.area_id) {
             areaIdCondition = `area_id = ${queryConditions.area_id}`
         }
         if (queryConditions.category_id) {
             categoryIdCondition = `category_id = ${queryConditions.category_id}`
         }
+        if(id){
+            afterId = id
+        }
 
+
+        return `WHERE job_offers.id > ${afterId}
+            ${areaIdCondition ? 'AND' : ''}
+            ${areaIdCondition}
+            ${categoryIdCondition ? ' AND ' : ''}        
+            ${categoryIdCondition}`
+    }
+
+    static async getJobOffers(queryConditions, id = null) {
+        const whereCondition = this.conditioner(queryConditions, id)
         const result = await query(`
             SELECT 
                 job_offers.*,
@@ -31,12 +53,10 @@ class JobOffersModel {
             LEFT OUTER JOIN skills ON skills.job_offer_id = job_offers.id
             INNER JOIN categories ON job_offers.category_id = categories.id
             INNER JOIN areas ON job_offers.area_id = areas.id
-            ${areaIdCondition || categoryIdCondition ? 'WHERE ' : ''}
-            ${areaIdCondition}
-            ${areaIdCondition && categoryIdCondition ? ' AND ' : ''}        
-            ${categoryIdCondition}
+            ${whereCondition}
             GROUP BY job_offers.id, categories.id, areas.id
             ORDER BY job_offers.id
+            LIMIT 5
             `)
 
 
