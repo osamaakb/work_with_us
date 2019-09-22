@@ -1,6 +1,8 @@
-const Portfolio = require('./portfolios-model')
-const sequelize = require('../ormDB')
-const Project = require('./projects-model')
+const models = require('../Models/index')
+const PortfoliosModel = models.portfolios
+const Project = models.portfolio_projects
+// const sequelize = require('../ormDB')
+// const Project = require('./projects-model')
 // const Sequelize, { Model } = require('sequlize')
 
 // class User extends Model {}
@@ -53,7 +55,7 @@ class UserModel {
     async createPortfolio(fields) {
         console.log(fields)
         fields.user_id = this.id
-        return Portfolio.create(fields, {
+        return PortfoliosModel.create(fields, {
             include: [
                 {
                     model: Project,

@@ -5,10 +5,66 @@ const validate = require('../validation/index')
 const portfolioSchema = require('../validation/portfolioSchema')
 const { auth } = require('../intializers/passport')
 const models = require('../Models/index')
+const { pageInformation } = require('../Services/GlobalService')
 const PortfoliosModel = models.portfolios
 const Project = models.portfolio_projects
-const Category = models.categories
-const Area = models.areas
+
+
+
+router.get('/search/:query', async (req, res) => {
+    const { query } = req.params
+    const { after } = req.query
+    const portfolios = await PortfoliosModel.search(query, after)
+
+    const count = await PortfoliosModel.countSearch(query)
+    let pageInfo
+    if (portfolios.length > 0) {
+        pageInfo = {
+            next: portfolios[portfolios.length - 1].id,
+            previous: portfolios[0].id,
+            totalCount: count
+        }
+    } else {
+        pageInfo = {
+            totalCount: count
+        }
+    }
+    res.json(constructResponse(portfolios, { pageInfo }))
+})
+
+
+router.put('/post/:id', auth, async (req, res) => {
+    let portfolio = {}
+    const { id } = req.params
+    if (req.user.admin) {
+        portfolio = await PortfoliosModel.update({ is_published: true }, { where: { id: id }, returning: true })
+    } else {
+        portfolio[1] = 'you are not an admin try again'
+    }
+    res.json(constructResponse(portfolio[1]))
+})
+
+router.get('/admin/:id*?', auth, validate(portfolioSchema.query, 'query'), async (req, res) => {
+    const query = req.query
+    const { id } = req.params
+    let portfolios
+    if (req.user.admin) {
+        if (id) {
+            portfolios = await PortfoliosModel.findAllAfter(query, id)
+        } else {
+            portfolios = await PortfoliosModel.scope('withAssociations', 'limitOrder', 'unPublished').findAll({
+                where: query,
+            })
+        }
+    } else {
+        portfolios = {}
+    }
+    const count = await PortfoliosModel.count({
+        where: query
+    })
+
+    res.json(constructResponse(portfolios, pageInformation(portfolios, count)))
+})
 
 
 router.get('/:id*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
@@ -18,20 +74,16 @@ router.get('/:id*?', validate(portfolioSchema.query, 'query'), async (req, res) 
     if (id) {
         portfolios = await PortfoliosModel.findAllAfter(query, id)
     } else {
-        portfolios = await PortfoliosModel.scope('withAssociations','limitOrder').findAll({
-            where: query ,
+        portfolios = await PortfoliosModel.scope('withAssociations', 'limitOrder', 'published').findAll({
+            where: query,
         })
-
     }
     const count = await PortfoliosModel.count({
         where: query
     })
-    const pageInfo = {
-        next: portfolios[portfolios.length - 1].id,
-        previous: portfolios[0].id,
-        totalCount: count
-    }
-    res.json(constructResponse(portfolios, { pageInfo }))
+
+    const page = pageInformation(portfolios, count)
+    res.json(constructResponse(portfolios, page))
 })
 
 router.post('/', auth, async (req, res) => {
@@ -43,13 +95,15 @@ router.post('/', auth, async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
     const { id } = req.params
     const isPortfolio = await PortfoliosModel.findOne({ where: { id: id } })
-    if (isPortfolio && req.user.id === isPortfolio.user_id) {
+    if ((isPortfolio && req.user.id === isPortfolio.user_id) || (req.user.admin)) {
         await PortfoliosModel.destroy({ where: { id: id } })
-        res.status(201).json(constructResponse([]))
+        res.status(200).json(constructResponse([]))
     } else {
-        res.status(403).json(constructResponse("You are not allowed to delete this job offer", { success: false }))
+        res.status(403).json(constructResponse("You are not allowed to delete this portfolio", { success: false }))
     }
 })
+
+
 
 
 router.put('/:id', auth, async (req, res) => {

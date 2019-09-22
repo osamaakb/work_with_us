@@ -12,7 +12,7 @@ opts.secretOrKey = process.env.SECRET
 passport.use(new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
         const user = await userModel.findUserByEmail(jwt_payload.email)
-        
+
         if (user) {
             return done(null, user)
         }
@@ -24,11 +24,11 @@ passport.use(new JwtStrategy(opts, async function (jwt_payload, done) {
     }
 }));
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
     done(null, user);
 });
 
@@ -42,6 +42,9 @@ module.exports.auth = (req, res, next) => passport.authenticate('jwt', (err, use
         next(new Error('User not found'))
     } else {
         req.user = user
+        if (req.user.email.endsWith('@workwithus.com')) {
+            req.user.admin = true
+        }
         next()
     }
 })(req, res, next)

@@ -5,7 +5,7 @@ const defaultOptions = {
 }
 
 class Response {
-    static constructResponse(payload, options) {
+    static constructResponse(payload, options = {}) {
         const success = options.success || defaultOptions.success
         const pageInfo = options.pageInfo || defaultOptions.pageInfo
         const response = { success }

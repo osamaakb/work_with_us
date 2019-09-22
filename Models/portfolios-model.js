@@ -1,4 +1,5 @@
-const { Model, Op } = require('sequelize');
+const Sequelize = require('sequelize');
+const { Model, Op } = Sequelize;
 
 module.exports = (sequelize, DataTypes) => {
     class PortfolioModel extends Model {
@@ -10,10 +11,27 @@ module.exports = (sequelize, DataTypes) => {
 
         static findAllAfter(query, afterId) {
             const { portfolios } = sequelize.models
-            return portfolios.scope('withAssociations', 'limitOrder').findAll({
-                where: { ...query, id: { [Op.gt]: afterId } },
-
+            return portfolios.scope('withAssociations', 'limitOrder', 'published').findAll({
+                where: { [Op.and]: [query], id: { [Op.gt]: afterId } },
             })
+        }
+
+
+        static search(searchQuery, id) {
+            let afterId = 0
+            if (id) {
+                afterId = id
+            }
+            const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
+
+            return this.findAllAfter(word, afterId)
+        }
+
+
+        static countSearch(searchQuery) {
+            const { portfolios } = sequelize.models
+            const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
+            return portfolios.count({ where: word })
         }
     }
 
@@ -38,6 +56,9 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.TEXT,
                 allowNull: false
+            },
+            is_published: {
+                type: DataTypes.BOOLEAN
             },
             job_type: {
                 type: DataTypes.ENUM('part', 'full', 'contract')
@@ -65,8 +86,16 @@ module.exports = (sequelize, DataTypes) => {
             modelName: 'portfolios',
             sequelize,
             scopes: {
+                published: {
+                    where: {
+                        is_published: true
+                    }
+                },
+                unPublished: {
+                    where: { is_published: false }
+                },
                 limitOrder: {
-                    limit: 5,
+                    limit: 20,
                     order: ['id']
                 },
                 withAssociations: () => {

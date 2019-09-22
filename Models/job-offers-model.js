@@ -4,12 +4,55 @@ class JobOffersModel {
 
 
 
-    static JobOffersCount(){
-        return query('SELECT COUNT(*) FROM job_offers' )
+    static updatePublished(id) {
+        return query(`UPDATE job_offers SET is_published = true WHERE id = ${id} RETURNING *`)
     }
 
 
-    static conditioner(queryConditions, id) {
+    static JobOffersSearchCount(searchQuery) {
+        return query(`SELECT COUNT(*) FROM job_offers WHERE to_tsvector(job_title) @@ to_tsquery('${searchQuery}')`)
+    }
+
+    static JobOffersCount() {
+        return query('SELECT COUNT(*) FROM job_offers')
+    }
+
+    static search(searchQuery, id) {
+        let afterId = 0
+        if (id) {
+            afterId = id
+        }
+        const res = `
+            SELECT 
+                job_offers.*,
+                categories.title AS category_title,
+                areas.title AS area_title,
+                CASE
+                WHEN COUNT(skills.*) > 0 THEN
+                    json_agg(
+                        json_build_object(
+                            'id', skills.id,
+                            'title', skills.title
+                        )
+                    )
+                ELSE
+                    '[]'
+                END AS skills                
+            FROM job_offers
+            LEFT OUTER JOIN skills ON skills.job_offer_id = job_offers.id
+            INNER JOIN categories ON job_offers.category_id = categories.id
+            INNER JOIN areas ON job_offers.area_id = areas.id
+            WHERE job_offers.id > ${afterId} AND job_offers.is_published = true AND to_tsvector(job_title) @@ to_tsquery('${searchQuery}')
+            GROUP BY job_offers.id, categories.id, areas.id            
+            ORDER BY job_offers.id
+            LIMIT 20`
+
+
+            console.log(res)
+            return query(res)
+    }
+
+    static conditioner(queryConditions, id, isPublished) {
         let areaIdCondition = ''
         let categoryIdCondition = ''
         let afterId = 0
@@ -19,20 +62,19 @@ class JobOffersModel {
         if (queryConditions.category_id) {
             categoryIdCondition = `category_id = ${queryConditions.category_id}`
         }
-        if(id){
+        if (id) {
             afterId = id
         }
 
-
-        return `WHERE job_offers.id > ${afterId}
+        return `WHERE job_offers.id > ${afterId} AND is_published = ${isPublished}
             ${areaIdCondition ? 'AND' : ''}
             ${areaIdCondition}
             ${categoryIdCondition ? ' AND ' : ''}        
             ${categoryIdCondition}`
     }
 
-    static async getJobOffers(queryConditions, id = null) {
-        const whereCondition = this.conditioner(queryConditions, id)
+    static async getJobOffers(queryConditions, id = null, isPublished) {
+        const whereCondition = this.conditioner(queryConditions, id, isPublished)
         const result = await query(`
             SELECT 
                 job_offers.*,
@@ -56,7 +98,7 @@ class JobOffersModel {
             ${whereCondition}
             GROUP BY job_offers.id, categories.id, areas.id
             ORDER BY job_offers.id
-            LIMIT 5
+            LIMIT 20
             `)
 
 
@@ -133,13 +175,13 @@ class JobOffersModel {
         BEGIN;
             UPDATE job_offers
             SET (${columns}) = (${Object.values(fields).map(element => {
-                return `'${element}'`
-            })})
+            return `'${element}'`
+        })})
             WHERE id = ${fields.id};
             UPDATE skills
             SET title = s.title
             FROM (VALUES 
-                ${skills.map(skill => {return `(${skill.id}, '${skill.title}')`}).join(',')}
+                ${skills.map(skill => { return `(${skill.id}, '${skill.title}')` }).join(',')}
             ) as s(id,title)
         
             WHERE job_offer_id = ${fields.id} AND skills.id = s.id;
@@ -170,9 +212,9 @@ class JobOffersModel {
             
             
             `
-            console.log(sql)
+        console.log(sql)
 
-            return query(sql)
+        return query(sql)
     }
 
 

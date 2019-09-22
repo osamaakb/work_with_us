@@ -6,8 +6,8 @@ const express = require('express')
 require('./Models')
 
 const morgan = require('morgan')
-
-const passport = require('./intializers/passport')
+const passport =  require('./intializers/passport')
+const { auth } = passport
 const { constructResponse } = require('./Services/response')
 
 const bodyParser = require('body-parser')
@@ -26,6 +26,7 @@ const JobOffersController = require('./Controllers/job-offers-controller')
 const AreasController = require('./Controllers/areas-controller')
 const CategoriesController = require('./Controllers/categories-controller')
 const PortfoliosController = require('./Controllers/portfolios-controller')
+const AdminController = require('./Controllers/admin-controller')
 
 
 app.use('/api/users', UserController)
@@ -33,6 +34,17 @@ app.use('/api/offers', JobOffersController)
 app.use('/api/areas', AreasController)
 app.use('/api/categories', CategoriesController)
 app.use('/api/portfolios', PortfoliosController)
+
+// const authorizeAdmin = (req, res, next) => {
+//     if (req.user.email.endWith('@workwithus.com')) {
+//         next();
+//     } else {
+//         res.status(400).json(constructResponse('your are not an admin', { success: false }))
+//     }
+// }
+// const adminAuthMiddlewares = [auth, authorizeAdmin]
+
+// app.use('/api/admin', ...adminAuthMiddlewares, AdminController)
 
 
 
