@@ -13,8 +13,8 @@ const userSchema = require('../validation/userSchema')
 
 
 router.get('/', async (req, res, next) => {
-    const users = await UserModel.getUsers();    
-    res.json(users.rows)
+    const users = await UserModel.getUsers();
+    res.json(constructResponse(users.rows))
 })
 
 // sign up
@@ -24,7 +24,7 @@ router.post('/',
         const { name, email, password } = req.body
         const hashedPass = await UserServices.hashPass(password)
         const { rows } = await UserModel.createUser(name, email, hashedPass)
-        let token = jwt.sign({ email: email }, secret);
+        let token = jwt.sign({ email: email }, secret);  // simplify
         res.json(constructResponse({ user: rows[0], token }))
     })
 
@@ -34,18 +34,18 @@ router.get('/me', auth, (req, res, next) => {
 
 
 // login
-router.post('/login',validate(userSchema.login), async (req, res, next) => {
+router.post('/login', validate(userSchema.login), async (req, res, next) => {
 
     const { email, password } = req.body
     const user = await UserModel.findUserByEmail(email)
-    if (user) {        
+    if (user) {
         const checkPass = await UserServices.checkPass(password, user.password)
         if (checkPass) {
             let token = jwt.sign({ email: email }, secret);
             delete user.password
             res.json(constructResponse({ user, token }))
         } else {
-            res.status(401).json({ message: 'invalid login, Check your password' })
+            res.status(401).json({ message: 'invalid login, Check your password' }) // simplify
         }
     } else {
         res.status(401).json({ message: 'invalid login,  Check your email' })
@@ -55,8 +55,10 @@ router.post('/login',validate(userSchema.login), async (req, res, next) => {
 
 router.delete('/me', auth,
     async (req, res, next) => {
-        await UserModel.deleteUser(req.user.id)
-        res.json(constructResponse())
+        if (req.user.admin) {
+            await UserModel.deleteUser(req.user.id)
+            res.json(constructResponse())
+        }
     }
 )
 
@@ -67,3 +69,12 @@ router.get('/:id([0-9]+)', async (req, res, next) => {
 })
 
 module.exports = router
+
+
+// http-error.js
+// function badRequest(res, msg = '') {
+//   res.status(400).json(msg, { success: false })
+//}
+// function unauthorized(res, msg = '') {
+//   res.status(401).json(msg, { success: false })
+//}

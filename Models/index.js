@@ -22,3 +22,13 @@ Object.keys(db).forEach(modelName => {
 });
 
 module.exports = db
+
+
+/*
+class Sequelize {
+    import(path) {
+        const definerFn = require(path)
+        definerFn(this, DataTypes)
+    }
+}
+*/

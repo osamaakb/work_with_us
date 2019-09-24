@@ -10,14 +10,9 @@ router.get('/', async (req, res, next) => {
 })
 
 router.post('/', async (req, res, next) => {
-    try {
         const { title } = req.body
         const categories = await CategoriesModel.create({ title: title });
-        console.log(categories)
         res.json(constructResponse(categories))
-    } catch (err) {
-        next(err)
-    }
 })
 
 router.delete('/:id', async (req, res, next) => {

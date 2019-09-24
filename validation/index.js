@@ -2,11 +2,12 @@ const {constructResponse} = require('../Services/response')
 const validate = (schema, from = 'body') => {
     return (req, res, next) => {
         const { error } = schema.validate(req[from]);
-        const valid = error == null;
+        const valid = !error;
 
         if (valid) {
             next();
         } else {
+            console.log(schema)
             const { details } = error;
             const message = details.map(i => i.message).join(',');
 

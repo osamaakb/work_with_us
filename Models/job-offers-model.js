@@ -13,8 +13,9 @@ class JobOffersModel {
         return query(`SELECT COUNT(*) FROM job_offers WHERE to_tsvector(job_title) @@ to_tsquery('${searchQuery}')`)
     }
 
+
     static JobOffersCount() {
-        return query('SELECT COUNT(*) FROM job_offers')
+        return query('SELECT COUNT(*) FROM job_offers') // add query to the count
     }
 
     static search(searchQuery, id) {
@@ -42,13 +43,13 @@ class JobOffersModel {
             LEFT OUTER JOIN skills ON skills.job_offer_id = job_offers.id
             INNER JOIN categories ON job_offers.category_id = categories.id
             INNER JOIN areas ON job_offers.area_id = areas.id
-            WHERE job_offers.id > ${afterId} AND job_offers.is_published = true AND to_tsvector(job_title) @@ to_tsquery('${searchQuery}')
+            WHERE job_offers.id > ${afterId} 
+                AND job_offers.is_published = true 
+                AND to_tsvector(job_title) @@ to_tsquery('${searchQuery}')
             GROUP BY job_offers.id, categories.id, areas.id            
             ORDER BY job_offers.id
             LIMIT 20`
 
-
-            console.log(res)
             return query(res)
     }
 
@@ -102,7 +103,7 @@ class JobOffersModel {
             `)
 
 
-        return result;
+        return result.rows.map(r => new JobOffersModel(r))
     }
 
 
@@ -157,9 +158,6 @@ class JobOffersModel {
             ORDER BY job_offers.id DESC
             LIMIT 1
         `
-
-
-        console.log(sql)
 
         return query(sql)
     }

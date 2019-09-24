@@ -3,36 +3,38 @@ const { Model, Op } = Sequelize;
 
 module.exports = (sequelize, DataTypes) => {
     class PortfolioModel extends Model {
+       
         static associate(models) {
             PortfolioModel.belongsTo(models.categories)
             PortfolioModel.belongsTo(models.areas)
             PortfolioModel.hasMany(models.portfolio_projects, { as: 'projects', foreignKey: 'portfolio_id' })
         }
 
-        static findAllAfter(query, afterId) {
-            const { portfolios } = sequelize.models
-            return portfolios.scope('withAssociations', 'limitOrder', 'published').findAll({
-                where: { [Op.and]: [query], id: { [Op.gt]: afterId } },
-            })
-        }
+        // static findAllAfter(query, afterId) {
+        //     const { portfolios } = sequelize.models
+        //     return portfolios.scope('withAssociations', 'limitOrder', 'published').findAll({
+        //         where: { [Op.and]: [query], id: { [Op.gt]: afterId } },
+        //     })
+        // }
 
 
-        static search(searchQuery, id) {
-            let afterId = 0
-            if (id) {
-                afterId = id
-            }
-            const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
+        // static search(searchQuery, id) {
+        //     let afterId = 0
+        //     if (id) {
+        //         afterId = id
+        //     }
+        //     const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
 
-            return this.findAllAfter(word, afterId)
-        }
+        //     return this.findAllAfter(word, afterId)
+        // }
 
 
-        static countSearch(searchQuery) {
-            const { portfolios } = sequelize.models
-            const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
-            return portfolios.count({ where: word })
-        }
+        // static countSearch(searchQuery) {
+        //     const { portfolios } = sequelize.models
+        //     const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
+        //     return portfolios.count({ where: word })
+        // }
+    
     }
 
     PortfolioModel.init(
@@ -98,6 +100,18 @@ module.exports = (sequelize, DataTypes) => {
                     limit: 20,
                     order: ['id']
                 },
+                after: (afterId, query) => ({
+                    where: {
+                        [Op.and]: [query],
+                        id: { [Op.gt]: afterId || 0 }
+                    }
+                }),
+                search: (afterId, query) => ({
+                    where: {
+                        [Op.and]: [Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${query}')`)],
+                        id: { [Op.gt]: afterId || 0 }
+                    }
+                }),
                 withAssociations: () => {
                     const { portfolio_projects, categories, areas } = sequelize.models
 

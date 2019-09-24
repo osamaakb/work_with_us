@@ -10,14 +10,9 @@ router.get('/', async (req, res, next) => {
 })
 
 router.post('/', async (req, res, next) => {
-    try {
         const { title } = req.body
-        const area = await AreasModel.create({ title });
-        console.log(area)
+        const area = await AreasModel.create({ title })
         res.json(constructResponse(area))
-    } catch (err) {
-        next(err)
-    }
 })
 
 router.delete('/:id', async (req, res, next) => {
