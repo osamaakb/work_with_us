@@ -103,6 +103,7 @@ class JobOffersModel {
             `)
 
 
+
         return result.rows.map(r => new JobOffersModel(r))
     }
 
@@ -210,7 +211,6 @@ class JobOffersModel {
             
             
             `
-        console.log(sql)
 
         return query(sql)
     }

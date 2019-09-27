@@ -17,26 +17,27 @@ router.get('/search/:query', async (req, res) => {
 })
 
 
-router.put('/publish/:id', auth, async (req, res) => {
-    const { id } = req.params
-    if (req.user.admin) {
-        const jobOffers = await JobOffersModel.updatePublished(id)
-        res.json(constructResponse(jobOffers.rows[0]))
-    } else {
-        res.json(constructResponse({ message: 'you are not admin' }))
-    }
-})
+// router.put('/publish/:id', auth, async (req, res) => {
+//     const { id } = req.params
+//     if (req.user.admin) {
+//         const jobOffers = await JobOffersModel.updatePublished(id)
+//         res.json(constructResponse(jobOffers.rows[0]))
+//     } else {
+//         res.json(constructResponse({ message: 'you are not admin' }))
+//     }
+// })
 
 
-router.get('/admin/:id*?', auth, async (req, res) => {
-    if (req.user.admin) {
-        const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, false)
-        const count = await JobOffersModel.JobOffersCount() // fix and add query to the count
-        res.json(constructResponse(jobOffers.rows,  { count: parseInt(count.rows[0].count) }))
-    } else {
-        res.json(constructResponse('not allowed'))
-    }
-})
+// router.get('/admin/:id*?', auth, async (req, res) => {
+//     if (req.user.admin) {
+//         const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, false)
+//         const count = await JobOffersModel.JobOffersCount() // fix and add query to the count
+//         res.json(constructResponse(jobOffers.rows,  { count: parseInt(count.rows[0].count) }))
+//     } else {
+//         res.json(constructResponse('not allowed'))
+//     }
+// })
+
 // id from params to query
 router.get('/:id*?', async (req, res) => {
     const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, true)
@@ -60,7 +61,6 @@ router.put('/', auth, async (req, res) => {
     const jobOffer = await req.user.updateJobOffer(fields, skills)
     res.status(201).json(constructResponse(jobOffer[4].rows[0]))
 })
-
 
 
 router.delete('/:id', auth, async (req, res) => {

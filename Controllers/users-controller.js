@@ -35,7 +35,6 @@ router.get('/me', auth, (req, res, next) => {
 
 // login
 router.post('/login', validate(userSchema.login), async (req, res, next) => {
-
     const { email, password } = req.body
     const user = await UserModel.findUserByEmail(email)
     if (user) {
@@ -53,14 +52,14 @@ router.post('/login', validate(userSchema.login), async (req, res, next) => {
 
 })
 
-router.delete('/me', auth,
-    async (req, res, next) => {
-        if (req.user.admin) {
-            await UserModel.deleteUser(req.user.id)
-            res.json(constructResponse())
-        }
-    }
-)
+// router.delete('/me', auth,
+//     async (req, res, next) => {
+//         if (req.user.admin) {
+//             await UserModel.deleteUser(req.user.id)
+//             res.json(constructResponse())
+//         }
+//     }
+// )
 
 router.get('/:id([0-9]+)', async (req, res, next) => {
     const { id } = req.params

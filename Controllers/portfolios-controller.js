@@ -20,42 +20,42 @@ router.get('/search/:query', async (req, res) => {
 })
 
 
-router.put('/publish/:id', auth, async (req, res) => {
-    let portfolio = {}
-    let responseArgs
-    let status
-    const { id } = req.params
-    if (req.user.admin) {
-        portfolio = await PortfoliosModel.update({ is_published: true }, { where: { id }, returning: true })
-        if (portfolio[0] == 0) {
-            responseArgs = ['Does not exist', { success: false }]
-            status = 404
-        } else {
-            responseArgs = [portfolio[1]]
-            status = 200
-        }
-    } else {
-        responseArgs = ['Not admin', { success: false }]
-        status = 401
-    }
-    res.status(status).json(constructResponse(...responseArgs))
-})
+// router.put('/publish/:id', auth, async (req, res) => {
+//     let portfolio = {}
+//     let responseArgs
+//     let status
+//     const { id } = req.params
+//     if (req.user.admin) {
+//         portfolio = await PortfoliosModel.update({ is_published: true }, { where: { id }, returning: true })
+//         if (portfolio[0] == 0) {
+//             responseArgs = ['Does not exist', { success: false }]
+//             status = 404
+//         } else {
+//             responseArgs = [portfolio[1]]
+//             status = 200
+//         }
+//     } else {
+//         responseArgs = ['Not admin', { success: false }]
+//         status = 401
+//     }
+//     res.status(status).json(constructResponse(...responseArgs))
+// })
 
-router.get('/admin/:id*?', auth, validate(portfolioSchema.query, 'query'), async (req, res) => {
-    const query = req.query
-    const { id } = req.params
-    let scopes = ['withAssociations', 'limitOrder', 'unPublished']
-    let portfolios
-    if (req.user.admin) {
-        portfolios = await PortfoliosModel.scope(scopes, { method: ['after', id, query] }).findAll()
-    } else {
-        portfolios = 'Not Admin'
-    }
-    const count = await PortfoliosModel.scope('unPublished').count({
-        where: query
-    })
-    res.json(constructResponse(portfolios, { count }))
-})
+// router.get('/admin/:id*?', auth, validate(portfolioSchema.query, 'query'), async (req, res) => {
+//     const query = req.query
+//     const { id } = req.params
+//     let scopes = ['withAssociations', 'limitOrder', 'unPublished']
+//     let portfolios
+//     if (req.user.admin) {
+//         portfolios = await PortfoliosModel.scope(scopes, { method: ['after', id, query] }).findAll()
+//     } else {
+//         portfolios = 'Not Admin'
+//     }
+//     const count = await PortfoliosModel.scope('unPublished').count({
+//         where: query
+//     })
+//     res.json(constructResponse(portfolios, { count }))
+// })
 
 // change id to after and put it in the query
 router.get('/:id*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
@@ -85,11 +85,9 @@ router.delete('/:id', auth, async (req, res) => {
         res.status(200).json(constructResponse([]))
     } else {
         res.status(403).json(constructResponse("You are not allowed to delete this portfolio", { success: false }))
-        // errors should be handled by error class
+        // errors should be handled by error class || responder middlewear
     }
 })
-
-
 
 
 router.put('/:id', auth, async (req, res) => {
