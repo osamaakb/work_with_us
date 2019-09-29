@@ -6,6 +6,7 @@ const routes = require('./Controllers')
 
 const morgan = require('morgan')
 const passport =  require('./intializers/passport')
+const RequestResponder = require('./Services/request-responder')
 const { auth } = passport
 const { constructResponse } = require('./Services/response')
 
@@ -14,7 +15,7 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(passport.initialize());
-// app.use(RequestResponder.initialize())
+app.use(RequestResponder.initialize())
 app.use(morgan('combined'))
 
 app.use(routes)

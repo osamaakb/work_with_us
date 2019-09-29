@@ -17,43 +17,35 @@ router.get('/portfolios/:id*?', validate(portfolioSchema.query, 'query'), async 
     const count = await PortfoliosModel.scope('unPublished').count({
         where: query
     })
-    res.json(constructResponse(portfolios, { count }))
+    // res.json(constructResponse(portfolios, { count }))
+    req.responder.success(portfolios, count)
 })
 
 
 router.put('/portfolios/publish/:id', async (req, res) => {
     let portfolio = {}
-    let responseArgs
-    let status
     const { id } = req.params
-        portfolio = await PortfoliosModel.update({ is_published: true }, { where: { id }, returning: true })
-        if (portfolio[0] == 0) {
-            responseArgs = ['Does not exist', { success: false }]
-            status = 404
-        } else {
-            responseArgs = [portfolio[1]]
-            status = 200
-        }
-    res.status(status).json(constructResponse(...responseArgs))
+    portfolio = await PortfoliosModel.update({ is_published: true }, { where: { id }, returning: true })
+    req.responder.updateResponse(portfolio)
 })
 
 
 router.put('/offers/publish/:id', async (req, res) => {
-        const { id } = req.params
-        const jobOffers = await JobOffersModel.updatePublished(id)
-        res.json(constructResponse(jobOffers.rows[0]))
+    const { id } = req.params
+    const jobOffers = await JobOffersModel.updatePublished(id)
+    req.responder.success(jobOffers.rows[0])
 })
 
 router.get('/offers/:id*?', async (req, res) => {
-        const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, false)
-        const count = await JobOffersModel.JobOffersCount() // fix and add query to the count)
-        res.json(constructResponse(jobOffers,  { count: parseInt(count.rows[0].count) }))
+    const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, false)
+    const count = await JobOffersModel.JobOffersCount() // fix and add query to the count)
+    req.responder.success(jobOffers, count.rows[0].count)
 })
 
 router.delete('/user', async (req, res) => {
-            await UserModel.deleteUser(req.user.id)
-            res.json(constructResponse())
-    }
+    await UserModel.deleteUser(req.user.id)
+    res.json(constructResponse())
+}
 )
 
 module.exports = router

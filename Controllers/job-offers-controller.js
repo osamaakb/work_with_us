@@ -1,10 +1,9 @@
 const router = require('express').Router();
 const JobOffersModel = require('../Models/job-offers-model')
-// const SkillsModel = require('../Models/skills-model')
-// const passport = require('passport')
-const { constructResponse, constructPageInfo} = require('../Services/response')
+// const { constructResponse, constructPageInfo} = require('../Services/response')
 const { auth } = require('../intializers/passport')
-
+const validate = require('../validation/index')
+const offerSchema = require('../validation/job-offers-schema')
 
 
 // put count in a function inside the response
@@ -13,7 +12,7 @@ router.get('/search/:query', async (req, res) => {
     const { after } = req.query
     const jobOffers = await JobOffersModel.search(query, after)
     const count = await JobOffersModel.JobOffersSearchCount(query)
-    res.json(constructResponse(jobOffers.rows, { count: parseInt(count.rows[0].count) }))
+    req.responder.success(jobOffers.rows, count.rows[0].count)
 })
 
 
@@ -38,20 +37,20 @@ router.get('/search/:query', async (req, res) => {
 //     }
 // })
 
-// id from params to query
-router.get('/:id*?', async (req, res) => {
-    const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, true)
+router.get('/', async (req, res) => {
+    const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.id, true)
     const count = await JobOffersModel.JobOffersCount() // fix and add query to the count
-    res.json(constructResponse(jobOffers, { count: parseInt(count.rows[0].count) }))
+    req.responder.success(jobOffers, count.rows[0].count)
+    
 })
 
 // only send fields
-router.post('/', auth, async (req, res) => {
+router.post('/', validate(offerSchema.offer) ,auth, async (req, res) => {
     const fields = req.body
     const skills = fields.skills
     delete fields.skills
     const jobOffer = await req.user.createJobOffer(fields, skills)
-    res.status(201).json(constructResponse(jobOffer[4].rows[0]))
+    req.responder.created(jobOffer[4].rows)
 })
 
 router.put('/', auth, async (req, res) => {
@@ -59,7 +58,7 @@ router.put('/', auth, async (req, res) => {
     const skills = fields.skills
     delete fields.skills
     const jobOffer = await req.user.updateJobOffer(fields, skills)
-    res.status(201).json(constructResponse(jobOffer[4].rows[0]))
+    req.responder.success(jobOffer[4].rows[0])
 })
 
 
@@ -68,9 +67,9 @@ router.delete('/:id', auth, async (req, res) => {
     const jobOffer = await JobOffersModel.findJobOfferById(id)
     if ((jobOffer && req.user.id === jobOffer.user_id) || (req.user.admin)) {
         await jobOffer.deleteJobOffer()
-        res.status(201).json(constructResponse([]))
+        req.responder.success('job offer deleted')
     } else {
-        res.status(403).json(constructResponse("You are not allowed to delete this job offer", { success: false }))
+        req.responder.unAuthorized()
     }
 })
 

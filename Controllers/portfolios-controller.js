@@ -5,7 +5,6 @@ const validate = require('../validation/index')
 const portfolioSchema = require('../validation/portfolioSchema')
 const { auth } = require('../intializers/passport')
 const models = require('../Models/index')
-const { pageInformation } = require('../Services/global-service')
 const PortfoliosModel = models.portfolios
 const Project = models.portfolio_projects
 
@@ -14,9 +13,9 @@ const Project = models.portfolio_projects
 router.get('/search/:query', async (req, res) => {
     const { query } = req.params
     const { after } = req.query
-    const portfolios = await PortfoliosModel.scope('published', 'limitOrder',{ method: ['search', after, query] }).findAll()
-    const count = await PortfoliosModel.scope('published',{ method: ['search', after, query] }).count()
-    res.json(constructResponse(portfolios, { count }))
+    const portfolios = await PortfoliosModel.scope('published', 'limitOrder', { method: ['search', after, query] }).findAll()
+    const count = await PortfoliosModel.scope('published', { method: ['search', after, query] }).count()
+    req.responder.success(portfolios, count)
 })
 
 
@@ -62,19 +61,17 @@ router.get('/:id*?', validate(portfolioSchema.query, 'query'), async (req, res) 
     const query = req.query
     const { id } = req.params
     let scopes = ['withAssociations', 'limitOrder', 'published']
-
     const portfolios = await PortfoliosModel.scope(scopes, { method: ['after', id, query] }).findAll()
-
     const count = await PortfoliosModel.scope('published').count({
         where: query
     })
-    res.json(constructResponse(portfolios, { count }))
+    req.responder.success(portfolios, count)
 })
 
-router.post('/', auth, async (req, res) => {
+router.post('/', validate(portfolioSchema.portfolio), auth, async (req, res) => {
     const fields = req.body
     const portfolio = await req.user.createPortfolio(fields)
-    res.json(constructResponse(portfolio))
+    req.responder.created(portfolio)
 })
 
 router.delete('/:id', auth, async (req, res) => {
@@ -82,10 +79,9 @@ router.delete('/:id', auth, async (req, res) => {
     const portfolio = await PortfoliosModel.findOne({ where: { id: id } })
     if ((portfolio && req.user.id === portfolio.user_id) || (req.user.admin)) {
         await PortfoliosModel.destroy({ where: { id: id } })
-        res.status(200).json(constructResponse([]))
+        req.responder.success('deleted')
     } else {
-        res.status(403).json(constructResponse("You are not allowed to delete this portfolio", { success: false }))
-        // errors should be handled by error class || responder middlewear
+        req.responder.unAuthorized("You are not allowed to delete this portfolio")
     }
 })
 

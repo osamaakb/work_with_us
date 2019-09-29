@@ -7,11 +7,8 @@ const validate = (schema, from = 'body') => {
         if (valid) {
             next();
         } else {
-            console.log(schema)
             const { details } = error;
             const message = details.map(i => i.message).join(',');
-
-            console.log("error", message);
             res.status(422).json(constructResponse(message, { success: false }))
         }
     }
