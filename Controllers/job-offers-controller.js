@@ -15,28 +15,6 @@ router.get('/search/:query', async (req, res) => {
     req.responder.success(jobOffers.rows, count.rows[0].count)
 })
 
-
-// router.put('/publish/:id', auth, async (req, res) => {
-//     const { id } = req.params
-//     if (req.user.admin) {
-//         const jobOffers = await JobOffersModel.updatePublished(id)
-//         res.json(constructResponse(jobOffers.rows[0]))
-//     } else {
-//         res.json(constructResponse({ message: 'you are not admin' }))
-//     }
-// })
-
-
-// router.get('/admin/:id*?', auth, async (req, res) => {
-//     if (req.user.admin) {
-//         const jobOffers = await JobOffersModel.getJobOffers(req.query, req.params.id, false)
-//         const count = await JobOffersModel.JobOffersCount() // fix and add query to the count
-//         res.json(constructResponse(jobOffers.rows,  { count: parseInt(count.rows[0].count) }))
-//     } else {
-//         res.json(constructResponse('not allowed'))
-//     }
-// })
-
 router.get('/', async (req, res) => {
     const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.id, true)
     const count = await JobOffersModel.JobOffersCount() // fix and add query to the count

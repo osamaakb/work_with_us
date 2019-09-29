@@ -36,7 +36,7 @@ class UserModel {
             this[key] = fields[key]
         })
     }
-
+    
     createJobOffer(fields, skills) {
         fields.user_id = this.id;
         return JobOffersModel.createJobOffer(fields, skills);
