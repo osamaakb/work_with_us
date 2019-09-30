@@ -14,8 +14,22 @@ class JobOffersModel {
     }
 
 
-    static JobOffersCount() {
-        return query('SELECT COUNT(*) FROM job_offers') // add query to the count
+    static JobOffersCount(queryConditions, isPublished) {
+        let areaIdCondition = ''
+        let categoryIdCondition = ''
+        if (queryConditions.area_id) {
+            areaIdCondition = `area_id = ${queryConditions.area_id}`
+        }
+        if (queryConditions.category_id) {
+            categoryIdCondition = `category_id = ${queryConditions.category_id}`
+        }
+
+        return query(`SELECT COUNT(*) FROM job_offers
+                    WHERE job_offers.id > 0 AND is_published = ${isPublished}
+                    ${areaIdCondition ? 'AND' : ''}
+                    ${areaIdCondition}
+                    ${categoryIdCondition ? ' AND ' : ''}        
+                    ${categoryIdCondition}`)
     }
 
     static search(searchQuery, id) {
@@ -50,7 +64,7 @@ class JobOffersModel {
             ORDER BY job_offers.id
             LIMIT 20`
 
-            return query(res)
+        return query(res)
     }
 
     static conditioner(queryConditions, id, isPublished) {
@@ -102,8 +116,6 @@ class JobOffersModel {
             LIMIT 20
             `)
 
-
-
         return result.rows.map(r => new JobOffersModel(r))
     }
 
@@ -122,10 +134,12 @@ class JobOffersModel {
 
 
 
-    static createJobOffer(fields, skills) {
+    static createJobOffer(fields) {
+        const skills = fields.skills
+        delete fields.skills
         const values = Object.values(fields)
         const columns = Object.keys(fields).join(',')
-        const placeHolders = values.map((value, index) => `$${index + 1}`).join(',')
+        // const placeHolders = values.map((value, index) => `$${index + 1}`).join(',')
 
         const sql = `
         BEGIN;

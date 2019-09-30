@@ -9,7 +9,6 @@ class Response {
     static constructResponse(payload, options = {}) {
         const success = options.success !== undefined ? options.success : defaultOptions.success
         let pageInfo = options.pageInfo || defaultOptions.pageInfo
-        console.log(success)
         if (!pageInfo) {
             const count = options.count
             if (Array.isArray(payload) && count) {

@@ -9,32 +9,6 @@ module.exports = (sequelize, DataTypes) => {
             PortfolioModel.belongsTo(models.areas)
             PortfolioModel.hasMany(models.portfolio_projects, { as: 'projects', foreignKey: 'portfolio_id' })
         }
-
-        // static findAllAfter(query, afterId) {
-        //     const { portfolios } = sequelize.models
-        //     return portfolios.scope('withAssociations', 'limitOrder', 'published').findAll({
-        //         where: { [Op.and]: [query], id: { [Op.gt]: afterId } },
-        //     })
-        // }
-
-
-        // static search(searchQuery, id) {
-        //     let afterId = 0
-        //     if (id) {
-        //         afterId = id
-        //     }
-        //     const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
-
-        //     return this.findAllAfter(word, afterId)
-        // }
-
-
-        // static countSearch(searchQuery) {
-        //     const { portfolios } = sequelize.models
-        //     const word = Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${searchQuery}')`)
-        //     return portfolios.count({ where: word })
-        // }
-    
     }
 
     PortfolioModel.init(

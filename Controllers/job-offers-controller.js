@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const JobOffersModel = require('../Models/job-offers-model')
-// const { constructResponse, constructPageInfo} = require('../Services/response')
 const { auth } = require('../intializers/passport')
 const validate = require('../validation/index')
 const offerSchema = require('../validation/job-offers-schema')
@@ -16,18 +15,14 @@ router.get('/search/:query', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.id, true)
-    const count = await JobOffersModel.JobOffersCount() // fix and add query to the count
-    req.responder.success(jobOffers, count.rows[0].count)
-    
+    const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.afterId, true)
+    const count = await JobOffersModel.JobOffersCount(req.query, true)
+    req.responder.success(jobOffers, count.rows[0].count)  
 })
 
-// only send fields
 router.post('/', validate(offerSchema.offer) ,auth, async (req, res) => {
     const fields = req.body
-    const skills = fields.skills
-    delete fields.skills
-    const jobOffer = await req.user.createJobOffer(fields, skills)
+    const jobOffer = await req.user.createJobOffer(fields)
     req.responder.created(jobOffer[4].rows)
 })
 
@@ -50,6 +45,5 @@ router.delete('/:id', auth, async (req, res) => {
         req.responder.unAuthorized()
     }
 })
-
 
 module.exports = router

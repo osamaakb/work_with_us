@@ -15,9 +15,9 @@ router.get('/search/:query', async (req, res) => {
     req.responder.success(portfolios, count)
 })
 
-router.get('/:afterId*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
+router.get('/', validate(portfolioSchema.query, 'query'), async (req, res) => {
     const query = req.query
-    const { afterId } = req.params
+    const { afterId } = req.query
     let scopes = ['withAssociations', 'limitOrder', 'published']
     const portfolios = await PortfoliosModel.scope(scopes, { method: ['after', afterId, query] }).findAll()
     const count = await PortfoliosModel.scope('published').count({
@@ -42,7 +42,6 @@ router.delete('/:id', auth, async (req, res) => {
         req.responder.unAuthorized('You are not allowed to delete this portfolio')
     }
 })
-
 
 router.put('/:id', auth, async (req, res) => {
     const fields = req.body

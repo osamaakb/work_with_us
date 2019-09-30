@@ -31,7 +31,7 @@ class RequestResponder {
     }
 
     unAuthorized(msg = 'unAuthorized') {
-        this.res.status(403).json(constructResponse(msg))
+        this.res.status(403).json(constructResponse(msg, { success: false }))
     }
 
     updateResponse([rowsAffected, rows]) {
