@@ -5,7 +5,6 @@ const validate = require('../validation/index')
 const offerSchema = require('../validation/job-offers-schema')
 
 
-// put count in a function inside the response
 router.get('/search/:query', async (req, res) => {
     const { query } = req.params
     const { after } = req.query
