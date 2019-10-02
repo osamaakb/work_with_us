@@ -7,7 +7,7 @@ const routes = require('./Controllers')
 const morgan = require('morgan')
 const passport =  require('./intializers/passport')
 const RequestResponder = require('./Services/request-responder')
-const { auth } = passport
+// const { auth } = passport
 const { constructResponse } = require('./Services/response')
 
 const bodyParser = require('body-parser')
@@ -32,9 +32,9 @@ app.use(function (data, req, res, next) {
 })
 
 
-
 const port = 3000
 app.listen(port, () => {
     console.log(`App running on port ${port}`)
 })
+
 

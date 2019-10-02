@@ -11,7 +11,6 @@ const secret = process.env.SECRET
 const userSchema = require('../validation/userSchema')
 
 
-
 router.get('/', async (req, res, next) => {
     const users = await UserModel.getUsers();
     res.json(constructResponse(users.rows))
@@ -32,7 +31,6 @@ router.get('/me', auth, (req, res, next) => {
     res.json(constructResponse(req.user))
 })
 
-
 // login
 router.post('/login', validate(userSchema.login), async (req, res, next) => {
     const { email, password } = req.body
@@ -52,13 +50,10 @@ router.post('/login', validate(userSchema.login), async (req, res, next) => {
 
 })
 
-// router.delete('/me', auth,
-//     async (req, res, next) => {
-//         if (req.user.admin) {
-//             await UserModel.deleteUser(req.user.id)
-//             res.json(constructResponse())
-//         }
-//     }
+// router.delete('/me', auth, async (req, res, next) => {
+//     await UserModel.deleteUser(req.user.id)
+//     res.json(constructResponse('deleted'))
+// }
 // )
 
 router.get('/:id([0-9]+)', async (req, res, next) => {
@@ -68,12 +63,3 @@ router.get('/:id([0-9]+)', async (req, res, next) => {
 })
 
 module.exports = router
-
-
-// http-error.js
-// function badRequest(res, msg = '') {
-//   res.status(400).json(msg, { success: false })
-//}
-// function unauthorized(res, msg = '') {
-//   res.status(401).json(msg, { success: false })
-//}

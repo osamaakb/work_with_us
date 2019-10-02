@@ -38,7 +38,7 @@ class RequestResponder {
         if (rowsAffected === 0) {
             this.notFound()
         } else {
-            this.success(rows)
+            this.success(rows[0])
         }
     }
 }

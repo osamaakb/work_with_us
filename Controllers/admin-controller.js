@@ -7,7 +7,6 @@ const portfolioSchema = require('../validation/portfolioSchema')
 const JobOffersModel = require('../Models/job-offers-model')
 
 
-
 router.get('/portfolios/:afterId*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
     const query = req.query
     const { afterId } = req.params
@@ -17,7 +16,6 @@ router.get('/portfolios/:afterId*?', validate(portfolioSchema.query, 'query'), a
     })
     req.responder.success(portfolios, count)
 })
-
 
 router.put('/portfolios/publish/:id', async (req, res) => {
     const { id } = req.params
@@ -32,7 +30,7 @@ router.put('/offers/publish/:id', async (req, res) => {
     req.responder.success(jobOffers.rows[0])
 })
 
-router.get('/offers/', async (req, res) => {
+router.get('/offers', async (req, res) => {
     const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.afterId, false)
     const count = await JobOffersModel.JobOffersCount(req.query, false)
     req.responder.success(jobOffers, count.rows[0].count)

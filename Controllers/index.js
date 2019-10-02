@@ -9,13 +9,11 @@ const { auth } = require('../intializers/passport')
 const { constructResponse } = require('../Services/response');
 
 
-
 router.use('/api/users', UserController)
 router.use('/api/offers', JobOffersController)
 router.use('/api/areas', AreasController)
 router.use('/api/categories', CategoriesController)
 router.use('/api/portfolios', PortfoliosController)
-
 
 const authorizeAdmin = (req, res, next) => {
     if (req.user.email.endsWith('@workwithus.com')) {

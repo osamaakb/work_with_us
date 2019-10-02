@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 router.post('/', validate(offerSchema.offer) ,auth, async (req, res) => {
     const fields = req.body
     const jobOffer = await req.user.createJobOffer(fields)
-    req.responder.created(jobOffer[4].rows)
+    req.responder.created(jobOffer[4].rows[0])
 })
 
 router.put('/', auth, async (req, res) => {

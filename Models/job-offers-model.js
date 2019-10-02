@@ -184,6 +184,7 @@ class JobOffersModel {
         const columns = Object.keys(fields).join(',')
 
 
+
         const sql = `
         BEGIN;
             UPDATE job_offers
@@ -221,9 +222,7 @@ class JobOffersModel {
             INNER JOIN categories ON job_offers.category_id = categories.id
             INNER JOIN areas ON job_offers.area_id = areas.id
             WHERE job_offers.id = ${fields.id}
-            GROUP BY job_offers.id, categories.id, areas.id
-            
-            
+            GROUP BY job_offers.id, categories.id, areas.id            
             `
 
         return query(sql)
