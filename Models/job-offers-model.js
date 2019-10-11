@@ -33,6 +33,8 @@ class JobOffersModel {
     }
 
     static search(searchQuery, id) {
+
+        // AND to_tsvector(job_title) @@ to_tsquery('${searchQuery}')
         let afterId = 0
         if (id) {
             afterId = id
@@ -59,7 +61,7 @@ class JobOffersModel {
             INNER JOIN areas ON job_offers.area_id = areas.id
             WHERE job_offers.id > ${afterId} 
                 AND job_offers.is_published = true 
-                AND to_tsvector(job_title) @@ to_tsquery('${searchQuery}')
+                AND job_title ILIKE '${searchQuery}%'
             GROUP BY job_offers.id, categories.id, areas.id            
             ORDER BY job_offers.id
             LIMIT 20`
@@ -178,12 +180,12 @@ class JobOffersModel {
     }
 
 
-    static updateJobOffer(fields, skills) {
+    static updateJobOffer(fields) {
 
+        const skills = fields.skills
+        delete fields.skills
         // const values = Object.values(fields)
         const columns = Object.keys(fields).join(',')
-
-
 
         const sql = `
         BEGIN;
@@ -192,6 +194,7 @@ class JobOffersModel {
             return `'${element}'`
         })})
             WHERE id = ${fields.id};
+            
             UPDATE skills
             SET title = s.title
             FROM (VALUES 
@@ -224,6 +227,8 @@ class JobOffersModel {
             WHERE job_offers.id = ${fields.id}
             GROUP BY job_offers.id, categories.id, areas.id            
             `
+
+
 
         return query(sql)
     }

@@ -58,6 +58,12 @@ module.exports = (sequelize, DataTypes) => {
             cv: {
                 type: DataTypes.TEXT
             },
+            rate: {
+                type: DataTypes.INTEGER
+            },
+            location: {
+                type: DataTypes.TEXT
+            },
         }, {
             modelName: 'portfolios',
             sequelize,
@@ -82,7 +88,7 @@ module.exports = (sequelize, DataTypes) => {
                 }),
                 search: (afterId, query) => ({
                     where: {
-                        [Op.and]: [Sequelize.literal(`to_tsvector(portfolios.title) @@ to_tsquery('${query}')`)],
+                        [Op.and]: [Sequelize.literal(`portfolios.title ILIKE '${query}%'`)],
                         id: { [Op.gt]: afterId || 0 }
                     }
                 }),

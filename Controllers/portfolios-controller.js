@@ -10,7 +10,7 @@ const Project = models.portfolio_projects
 router.get('/search/:query', async (req, res) => {
     const { query } = req.params
     const { after } = req.query
-    const portfolios = await PortfoliosModel.scope('published', 'limitOrder', { method: ['search', after, query] }).findAll()
+    const portfolios = await PortfoliosModel.scope('withAssociations', 'published', 'limitOrder', { method: ['search', after, query] }).findAll()
     const count = await PortfoliosModel.scope('published', { method: ['search', after, query] }).count()
     req.responder.success(portfolios, count)
 })

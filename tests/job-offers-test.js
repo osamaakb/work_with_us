@@ -37,16 +37,16 @@ describe('offers test', function () {
             .expect('Content-Type', /json/)
             .expect(200, (err, res) => {
                 const offer = res.body.payload
-                id = res.body.payload.id
+                id = offer.id
                 expect(res.body.success).to.equal(true)
-                expect(res.body.payload).to.include(offer)
+                expect(offer).to.be.an('object')
                 skillId = offer.skills;
                 done()
             })
     })
 
 
-    it('should send back a JSON object with success set to true and array of portfolios', function (done) {
+    it('should send back a JSON object with success set to true and array of offers', function (done) {
         request
             .get('')
             .set('Content-Type', 'application/json')
@@ -85,7 +85,7 @@ describe('offers test', function () {
                 const offer = res.body.payload
                 expect(res.body.success).to.equal(true)
                 expect(offer.job_title).to.equal('new job offer updated')
-                
+
                 done()
             })
     })

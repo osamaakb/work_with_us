@@ -9,18 +9,4 @@ router.get('/', async (req, res, next) => {
     res.json(constructResponse(categories))
 })
 
-router.post('/', async (req, res, next) => {
-        const { title } = req.body
-        const categories = await CategoriesModel.create({ title: title });
-        res.json(constructResponse(categories))
-})
-
-router.delete('/:id', async (req, res, next) => {
-    const { id } = req.params
-    await CategoriesModel.destroy({ where: { id: id } });
-    res.json(constructResponse({}))
-})
-
-
-
 module.exports = router

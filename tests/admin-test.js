@@ -3,7 +3,6 @@ request = request('http://localhost:3000/api/admin/')
 
 const expect = require('chai').expect;
 
-
 const token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHdvcmt3aXRodXMuY29tIiwiaWF0IjoxNTY4OTY3OTc2fQ.3Qlzg_3MwGDXZYkJPCIVIY_lWMXoF4WM-A25FexBFkM'
 let portfolioId
 let offerId

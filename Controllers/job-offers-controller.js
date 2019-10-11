@@ -16,10 +16,10 @@ router.get('/search/:query', async (req, res) => {
 router.get('/', async (req, res) => {
     const jobOffers = await JobOffersModel.getJobOffers(req.query, req.query.afterId, true)
     const count = await JobOffersModel.JobOffersCount(req.query, true)
-    req.responder.success(jobOffers, count.rows[0].count)  
+    req.responder.success(jobOffers, count.rows[0].count)
 })
 
-router.post('/', validate(offerSchema.offer) ,auth, async (req, res) => {
+router.post('/', validate(offerSchema.offer), auth, async (req, res) => {
     const fields = req.body
     const jobOffer = await req.user.createJobOffer(fields)
     req.responder.created(jobOffer[4].rows[0])
@@ -27,9 +27,7 @@ router.post('/', validate(offerSchema.offer) ,auth, async (req, res) => {
 
 router.put('/', auth, async (req, res) => {
     const fields = req.body
-    const skills = fields.skills
-    delete fields.skills
-    const jobOffer = await req.user.updateJobOffer(fields, skills)
+    const jobOffer = await req.user.updateJobOffer(fields)
     req.responder.success(jobOffer[4].rows[0])
 })
 
