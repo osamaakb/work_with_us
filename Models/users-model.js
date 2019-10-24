@@ -27,16 +27,18 @@ class UserModel {
     static getSingleUser(id) { return query(`SELECT * FROM users WHERE id= $1`, [id]) }
     static async findUserByEmail(email) {
         const res = await query('SELECT * FROM users WHERE email = $1', [email])
-        if (res.rows) return new UserModel(res.rows[0])
-        return null
+        if (res.rows[0]) { return new UserModel(res.rows[0]) }
+        else { return null }
     }
 
     constructor(fields) {
-        Object.keys(fields).forEach(key => {
-            this[key] = fields[key]
-        })
+        if (fields) {
+            Object.keys(fields).forEach(key => {
+                this[key] = fields[key]
+            })
+        }
     }
-    
+
     createJobOffer(fields, skills) {
         fields.user_id = this.id;
         return JobOffersModel.createJobOffer(fields, skills);

@@ -17,9 +17,10 @@ router.get('/search/:query', async (req, res) => {
 
 router.get('/', validate(portfolioSchema.query, 'query'), async (req, res) => {
     const query = req.query
-    const { afterId } = req.query
+    const { after } = req.query
+    delete query.after
     let scopes = ['withAssociations', 'limitOrder', 'published']
-    const portfolios = await PortfoliosModel.scope(scopes, { method: ['after', afterId, query] }).findAll()
+    const portfolios = await PortfoliosModel.scope(scopes, { method: ['after', after, query] }).findAll()
     const count = await PortfoliosModel.scope('published').count({
         where: query
     })

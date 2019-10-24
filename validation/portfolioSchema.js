@@ -5,6 +5,7 @@ const portfolioSchema = {
     query : Joi.object().keys({
         area_id: Joi.number().integer(),
         category_id: Joi.number().integer(),
+        after: Joi.number().integer()
     }),
     portfolio : Joi.object().unknown().keys({
         area_id: Joi.number().integer().required(),
