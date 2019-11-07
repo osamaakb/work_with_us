@@ -9,9 +9,10 @@ const portfolioSchema = require('../validation/portfolioSchema')
 const JobOffersModel = require('../Models/job-offers-model')
 
 
-router.get('/portfolios/:afterId*?', validate(portfolioSchema.query, 'query'), async (req, res) => {
+router.get('/portfolios', validate(portfolioSchema.query, 'query'), async (req, res) => {
     const query = req.query
-    const { afterId } = req.params
+    const { afterId } = req.query
+    delete query.afterId
     const portfolios = await PortfoliosModel.scope('withAssociations', 'limitOrder', 'unPublished', { method: ['after', afterId, query] }).findAll()
     const count = await PortfoliosModel.scope('unPublished').count({
         where: query

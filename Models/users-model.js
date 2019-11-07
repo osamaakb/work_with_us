@@ -55,7 +55,6 @@ class UserModel {
     }
 
     async createPortfolio(fields) {
-        console.log(fields)
         fields.user_id = this.id
         return PortfoliosModel.create(fields, {
             include: [
