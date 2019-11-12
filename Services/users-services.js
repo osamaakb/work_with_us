@@ -4,7 +4,6 @@ const saltRounds = 12
 
 class UserService {
  
-    // comment for github
     // these should be async
 
     static hashPass(password) {
