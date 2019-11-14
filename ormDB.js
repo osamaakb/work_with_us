@@ -5,6 +5,7 @@ const sequelize = new Sequelize({
   dialect: 'postgres',
   database: process.env.PGDATABASE,
   username: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
   define: {
     timestamps: true,
