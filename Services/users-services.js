@@ -12,7 +12,7 @@ class UserService {
                 if (err) {
                     return reject(err)
                 }
-                bcrypt.hash(password, salt, function (err, hash) {
+                bcrypt.hash(password, salt, null, function (err, hash) {
                     if (err) {
                         return reject(err)
                     }
