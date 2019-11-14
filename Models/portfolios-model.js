@@ -46,12 +46,6 @@ module.exports = (sequelize, DataTypes) => {
             email: {
                 type: DataTypes.TEXT
             },
-            lat: {
-                type: DataTypes.FLOAT
-            },
-            lng: {
-                type: DataTypes.FLOAT
-            },
             website: {
                 type: DataTypes.TEXT
             },
