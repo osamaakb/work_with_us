@@ -55,6 +55,9 @@ module.exports = (sequelize, DataTypes) => {
             rate: {
                 type: DataTypes.INTEGER
             },
+            rate_count: {
+                type: DataTypes.INTEGER
+            },
             location: {
                 type: DataTypes.TEXT
             },
