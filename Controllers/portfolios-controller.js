@@ -5,6 +5,7 @@ const { auth } = require('../intializers/passport')
 const models = require('../Models/index')
 const PortfoliosModel = models.portfolios
 const Project = models.portfolio_projects
+const PortfolioService = require('../Services/portfolios-service')
 
 
 router.get('/search/:query', async (req, res) => {
@@ -56,6 +57,15 @@ router.put('/projects/:id', auth, async (req, res) => {
     const { id } = req.params
     const project = await Project.update(fields, { where: { id }, returning: true, })
     req.responder.updateResponse(project)
+})
+
+
+router.put('/rate/:id', auth, async (req, res) => {
+    const fields = req.body
+    const { id } = req.params
+    
+    const portfolio = await PortfoliosModel.update({ rate: PortfolioService.updateRate(fields.new_rate, fields.rate, fields.rate_count + 1), rate_count: fields.rate_count + 1 }, { where: { id }, returning: true })
+    req.responder.updateResponse(portfolio)
 })
 
 
