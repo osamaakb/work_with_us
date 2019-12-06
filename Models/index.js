@@ -4,6 +4,8 @@ const basename = path.basename(__filename);
 let db = {}
 const sequelize = require('../ormDB')
 
+
+
 fs
     .readdirSync(__dirname)
     .filter(file => {

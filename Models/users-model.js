@@ -27,6 +27,7 @@ class UserModel {
     static getSingleUser(id) { return query(`SELECT * FROM users WHERE id= $1`, [id]) }
     static async findUserByEmail(email) {
         const res = await query('SELECT * FROM users WHERE email = $1', [email])
+        console.log(res.rows[0])
         if (res.rows[0]) { return new UserModel(res.rows[0]) }
         else { return null }
     }

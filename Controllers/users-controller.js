@@ -20,7 +20,7 @@ router.get('/', async (req, res, next) => {
 router.post('/',
     validate(userSchema.signup)
     , async (req, res, next) => {
-        const { name, email, password } = req.body
+        const { name, email, password } = req.body    
         const hashedPass = await UserServices.hashPass(password)
         const { rows } = await UserModel.createUser(name, email, hashedPass)
         let token = jwt.sign({ email: email }, secret);  // simplify
@@ -35,6 +35,7 @@ router.get('/me', auth, (req, res, next) => {
 router.post('/login', validate(userSchema.login), async (req, res, next) => {
     const { email, password } = req.body
     const user = await UserModel.findUserByEmail(email)
+
     if (user) {
         const checkPass = await UserServices.checkPass(password, user.password)
         if (checkPass) {
